@@ -38,14 +38,23 @@ describe('Calendar Service', () => {
   });
 
   describe('Month data', () => {
-    it('gets data about days for selected month', () => {
-      let date = moment(new Date(2015, 2, 1));
-      let daysInMonth = 30;
-      let daysInCard = (Math.ceil(daysInMonth / 7) + 1) * 7;
-      let daysCount = CalendarService.getMonthData(date).length;
+    const testDaysNumber = (plainDate) => {
+      let date = moment(plainDate);
+      let month = date.month();
+      let daysInMonth = date.daysInMonth();
 
-      expect(daysCount).toBeGreaterThan(daysInMonth);
-      expect(daysCount).not.toBeGreaterThan(daysInCard);
+      let daysCount = CalendarService.getMonthData(date)
+        .filter(x => x.date.getMonth() === month).length;
+
+      expect(daysCount).toEqual(daysInMonth);
+    };
+
+    it('gets data about days for selected month (start date sunday)', () => {
+      testDaysNumber(new Date(2015, 2, 1));
+    });
+
+    it('gets data about days for selected month (start date other)', () => {
+      testDaysNumber(new Date(2015, 3, 1));
     });
   });
 });
