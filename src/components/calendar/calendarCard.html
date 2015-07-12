@@ -1,0 +1,9 @@
+<section class="calendarCard">
+  <ol class="calendarCard--dayNames">
+    <li ng-repeat="weekDay in weekDayNames">{{ ::weekDay }}</li>
+  </ol>
+  <ol class="calendarCard--days">
+    <li data-date="{{ ::day.date }}"
+        ng-repeat="day in days">{{ ::day.name }}</li>
+  </ol>
+</section>

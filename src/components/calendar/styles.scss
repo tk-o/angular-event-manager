@@ -1,0 +1,27 @@
+body {
+  background-color: #fff;
+}
+
+%col7Grid {
+  padding: 0;
+  display:flex;
+  flex-wrap: wrap;
+  
+  li {
+    width: calc(100% / 7);
+    list-style: decimal inside;
+    text-align: center;
+    box-sizing: border-box;
+    border: 1px solid;
+    list-style: none;
+    position: relative;
+  }
+}
+
+ol.calendarCard--dayNames {
+  @extend %col7Grid;
+}
+
+ol.calendarCard--days {
+  @extend %col7Grid;
+}

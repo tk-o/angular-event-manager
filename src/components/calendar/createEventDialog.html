@@ -1,0 +1,15 @@
+<form ng-submit="createEvent(event)">
+  <div class="row row--name">
+    <input type="text" ng-model="event.name" placeholder="Nazwa" />
+  </div>
+  <div class="row row--name">
+    <textarea ng-model="event.description" placeholder="Opis"></textarea>
+  </div>
+  <div class="row row--dates">
+    <input type="date" ng-model="event.startDate" title="Data początkowa" />
+    <input type="date" ng-model="event.endDate" title="Data końcowa" />
+  </div>
+  <div class="row row--button">
+    <button type="submit" title="Dodaj wydarzenie">Dodaj wydarzenie</button>
+  </div>
+</form>

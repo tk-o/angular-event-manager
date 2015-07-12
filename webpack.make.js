@@ -143,15 +143,23 @@ module.exports = function makeWebpackConfig (options) {
     loader: ExtractTextPlugin.extract('style', 'css?sourceMap!postcss')
   };
 
+  var sassLoader = {
+      test: /\.scss$/,
+      loader: 'style!css!sass'
+  };
+
   // Skip loading css in test mode
   if (TEST) {
     // Reference: https://github.com/webpack/null-loader
-    // Return an empty module
-    cssLoader.loader = 'null'
+    // Return an empty module    
+    cssLoader.loader = 'null';
+    sassLoader.loader = 'null';
   }
 
   // Add cssLoader to the loader list
   config.module.loaders.push(cssLoader);
+  config.module.loaders.push(sassLoader);
+
 
   /**
    * PostCSS

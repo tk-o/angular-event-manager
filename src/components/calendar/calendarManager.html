@@ -1,0 +1,22 @@
+<header>
+  <aside>
+    <h1>{{ calendar.localeData.months(calendar.selectedDate) }}</h1>
+    <h2>{{ calendar.selectedDate.toDate() | date: 'yyyy'}}</h2>
+  </aside>
+
+  <section>
+    <button class="btn btn--create" ng-click="calendar.openCreateEventDialog()">Dodaj</button>
+  </section>
+
+  <nav>
+    <ul>
+      <li>
+        <button ng-click="calendar.displayPreviousMonth()">Poprzedni</button>
+        <button ng-click="calendar.displayCurrentMonth()">Dziś</button>
+        <button ng-click="calendar.displayNextMonth()">Następny</button>
+      </li>
+    </ul>
+  </nav>
+</header>
+
+<calendar-card days="calendar.days" />
