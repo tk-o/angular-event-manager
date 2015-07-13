@@ -1,6 +1,7 @@
 import angular from 'angular';
 import ngstorage from 'ngstorage';
 import moment from 'moment';
+import 'moment-range';
 import shortid from 'shortid';
 
 import calendarConfig from './calendar.config.js';
@@ -8,6 +9,7 @@ import calendarConfig from './calendar.config.js';
 const _eventCollection = [];
 
 let _localStorageService;
+let _$q;
 let _lsPrefix;
 let _lsEvents;
 let _lsLastSelectedDate;
@@ -15,8 +17,9 @@ let _lsLastSelectedDate;
 moment.locale('pl');
 
 class CalendarService {
-  constructor(CalendarConfig, LocalStorageService) {
+  constructor(CalendarConfig, LocalStorageService, $q) {
     _localStorageService = LocalStorageService;
+    _$q = $q;
 
     this.loadConfiguration(CalendarConfig);
     this.loadEvents();
@@ -60,6 +63,10 @@ class CalendarService {
 
       currentDate.add(7, 'd');      
     } while(!isDone());
+
+    _eventCollection.forEach(e => {
+      
+    });
 
     return monthData;
   }
@@ -121,15 +128,34 @@ class CalendarService {
   }
 
   createEvent(eventData) {
-    eventData.id = shortid.generate();;
+    const deferred = _$q.defer();
 
-    _eventCollection.push(eventData);
+    const eventRange = moment.range(eventData.startDate, eventData.endDate);
+    const isEventOverlappingOtherOne = _eventCollection.some(e => {
+      let currentRange = moment.range(e.startDate, e.endDate);
 
-    this.saveEvents();
+      return eventRange.overlaps(currentRange);
+    });
+    eventData.id = shortid.generate();
+    
+    if(isEventOverlappingOtherOne) {
+      deferred.reject({
+        message: 'Nie zapisano. Istnieją już inne zdarzenia w wybranym przedziale czasu.'
+      });
+    } else {
+      _eventCollection.push(eventData);
+      this.saveEvents();
+
+      deferred.resolve({
+        message: 'Zapisano wydarzenie'
+      });
+    }
+
+    return deferred.promise;
   }
 }
 
-CalendarService.$inject = ['CalendarConfig', '$localStorage'];
+CalendarService.$inject = ['CalendarConfig', '$localStorage', '$q'];
 
 export default angular.module('app.calendar.services', [calendarConfig, 'ngStorage'])
   .service('CalendarService', CalendarService)

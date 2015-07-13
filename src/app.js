@@ -5,7 +5,7 @@ import routing from './app.routing';
 import calendarComponent from './components/calendar';
 
 import 'normalize.css';
-import './assets/styles.scss';
+import './assets/styles/styles.scss';
 
 angular.module('app', [uiRouter, calendarComponent])
   .config(routing);

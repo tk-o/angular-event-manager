@@ -37,25 +37,49 @@ class CalendarController {
   }
 
   displayNextMonth() {
-    let dateToSet = this.selectedDate.clone().add(1, 'month');
+    let dateToSet = this.selectedDate.clone()
+      .add(1, 'month');
     
     this.displayCalendarCard(dateToSet);
   }
   
   openCreateEventDialog() {
-    _ngDialog.open({ 
-      template: require('./createEventDialog.html'),
-      plain: true,
-      controller: ['$scope', ($scope) => {
-        $scope.event = {};
-        $scope.createEvent = (eventToSave) => {
-          _calendarService.createEvent(eventToSave);
-        };
-      }]
-    });
+    const template = require('./createEventDialog.html');
+    const dialog = createDialog(template, createEventController);
+
+    function createEventController($scope) {
+      $scope.event = {};
+      $scope.createEvent = (eventToSave) => {
+        _calendarService.createEvent(eventToSave)
+          .then(onEventSaveSuccess, onEventSaveError);
+      };
+
+      function onEventSaveSuccess(response) {
+        $scope.message = response.message;
+
+        setTimeout(() => dialog.close(), 2000);
+      }
+
+      function onEventSaveError(response) {
+        $scope.message = response.message;
+
+        setTimeout(() => $scope.message = null, 2000);
+      }
+    }
   }
 }
 
 CalendarController.$inject = ['CalendarService', 'ngDialog'];
+
+function createDialog (template, controller) {
+  const dialog = _ngDialog.open({ 
+    template: template,
+    plain: true,
+    className: '',
+    controller: ['$scope', controller]
+  });
+
+  return dialog;
+}
 
 export default CalendarController;
