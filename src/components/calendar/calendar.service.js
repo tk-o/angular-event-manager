@@ -138,7 +138,11 @@ class CalendarService {
     });
     eventData.id = shortid.generate();
     
-    if(isEventOverlappingOtherOne) {
+    if(!eventData.isValid) {
+      deferred.reject({
+        message: 'Proszę wypełnić wszystkie pola formularza.'
+      });
+    } else if(isEventOverlappingOtherOne) {
       deferred.reject({
         message: 'Nie zapisano. Istnieją już inne zdarzenia w wybranym przedziale czasu.'
       });

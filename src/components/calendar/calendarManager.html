@@ -5,18 +5,32 @@
   </aside>
 
   <section>
-    <button class="btn btn--create" ng-click="calendar.openCreateEventDialog()">Dodaj</button>
+    <button class="btn btn--create"
+      title="Dodaj" 
+      ng-click="calendar.openCreateEventDialog()">Dodaj</button>
   </section>
 
   <nav>
     <ul>
       <li>
-        <button ng-click="calendar.displayPreviousMonth()">Poprzedni</button>
-        <button ng-click="calendar.displayCurrentMonth()">Dziś</button>
-        <button ng-click="calendar.displayNextMonth()">Następny</button>
+        <button class="btn btn--prev"
+          title="Poprzedni" 
+          ng-click="calendar.displayPreviousMonth()">Poprzedni</button>
+      </li>
+      <li>
+        <button class="btn btn--current"
+          title="Dziś" 
+          ng-click="calendar.displayCurrentMonth()">Dziś</button>
+      </li>
+      <li>
+        <button class="btn btn--next"
+          title="Następny" 
+          ng-click="calendar.displayNextMonth()">Następny</button>
       </li>
     </ul>
   </nav>
 </header>
 
-<calendar-card days="calendar.days" />
+<section>
+  <calendar-card days="calendar.days" selected-date="calendar.selectedDate" />  
+</section>

@@ -4,6 +4,8 @@
   </ol>
   <ol class="calendarCard--days">
     <li data-date="{{ ::day.date }}"
-        ng-repeat="day in days">{{ ::day.name }}</li>
+      ng-click="selectDay(day)"  
+      ng-class="{'selected':day.isToday}"
+      ng-repeat="day in days">{{ ::day.name }}</li>
   </ol>
 </section>

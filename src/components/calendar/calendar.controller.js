@@ -6,19 +6,18 @@ let _ngDialog;
 moment.locale('pl');
 
 class CalendarController {
-  constructor(CalendarService, ngDialog) {
+  constructor($scope, CalendarService, ngDialog) {
     _calendarService = CalendarService;
     _ngDialog = ngDialog;
 
     this.selectedDate = _calendarService.getLastSelectedDate();
-    this.days = _calendarService.getMonthData(this.selectedDate);
+    $scope.$watch(angular.bind(this, () => this.selectedDate), nv => this.displayCalendarCard(nv));
+
     this.localeData = moment.localeData();
   }
 
   displayCalendarCard(date) {
     _calendarService.setLastSelectedDate(date);
-
-    this.selectedDate = date;
     this.days = _calendarService.getMonthData(date);
   }
 
@@ -57,19 +56,22 @@ class CalendarController {
       function onEventSaveSuccess(response) {
         $scope.message = response.message;
 
-        setTimeout(() => dialog.close(), 2000);
+        setTimeout(() => dialog.close(), 1500);
       }
 
       function onEventSaveError(response) {
         $scope.message = response.message;
 
-        setTimeout(() => $scope.message = null, 2000);
+        setTimeout(() => {
+          $scope.message = null; 
+          $scope.$apply();
+        }, 3000);
       }
     }
   }
 }
 
-CalendarController.$inject = ['CalendarService', 'ngDialog'];
+CalendarController.$inject = ['$scope', 'CalendarService', 'ngDialog'];
 
 function createDialog (template, controller) {
   const dialog = _ngDialog.open({ 

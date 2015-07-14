@@ -1,16 +1,18 @@
-<form ng-submit="createEvent(event)">
+<form name="createEventForm" ng-submit="event.isValid=createEventForm.$isValid;createEvent(event)" novalidate>
   <div class="row row--name">
-    <input type="text" ng-model="event.name" placeholder="Nazwa" />
+    <input type="text" ng-model="event.name" placeholder="Nazwa" required />
   </div>
   <div class="row row--name">
-    <textarea ng-model="event.description" placeholder="Opis wydarzenia"></textarea>
+    <textarea ng-model="event.description" placeholder="Opis wydarzenia" required></textarea>
   </div>
   <div class="row row--dates">
-    <input type="date" ng-model="event.startDate" title="Data początkowa" />
-    <input type="date" ng-model="event.endDate" title="Data końcowa" />
+    <input type="date" ng-model="event.startDate" title="Data początkowa" required />
+    <input type="date" ng-model="event.endDate" title="Data końcowa" required />
   </div>
-  <div class="row row--button">
-    <p ng-class="{ 'visible': message }">{{ message }}</p>
+  <div class="row row--button" ng-class="{ 'message': message }">
     <button type="submit" title="Dodaj wydarzenie"></button>
+    <aside>
+      <p>{{ message }}</p>
+    </aside>
   </div>
 </form>

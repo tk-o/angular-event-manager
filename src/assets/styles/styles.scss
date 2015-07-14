@@ -1,3 +1,90 @@
 body {
+  color: #000;
   font-size: 100%;
+  font-family: "Helvetica Neue", Helvetica, Arial, "Lucida Grande", sans-serif;
+
+  main {
+    $headerHeight: 195px;
+
+    %flexCentered {      
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    > header {
+      @extend %flexCentered;
+      height: $headerHeight;
+      padding: 50px 75px;
+
+      .btn {
+        @extend %flexCentered;
+        height: 50px;
+        font-size: 24px;
+        opacity: .5;
+
+        i {
+          display: inline;
+          margin-left: 10px;
+        }
+
+        &.btn--prev, &.btn--next {
+          font-size: 0;
+          width: 50px;
+          position: relative;
+
+          &:before, &:after {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+          }
+
+          &:before {
+            width: 35px;
+            height: 35px;
+            background-color: #000;
+          }
+
+          &:after {
+            width: 31px;
+            height: 31px;
+            background-color: #fff;
+            margin: -1px 0 0 -1px;
+          }
+
+          &.btn--prev {
+            transform: rotate(135deg);
+          }
+
+          &.btn--next {
+            transform: rotate(-45deg);
+          }
+        }
+      }
+
+      aside {
+        h1 {
+          font-size: 32px;
+          width: 200px;
+        }
+        h2 {
+          font-size: 24px;
+          color: rgba(0,0,0,.55);
+        }
+      }
+
+      nav ul {
+        display: flex;
+
+        li {
+          margin: 0 10px;
+        }
+      }
+    }
+
+    > section {
+      height: calc(100vh - #{$headerHeight});
+    }
+  }
 }

@@ -4,26 +4,58 @@ body {
 
 %col7Grid {
   padding: 0;
+  margin: 0;
   display:flex;
   flex-wrap: wrap;
   
   li {
     width: calc(100% / 7);
-    list-style: decimal inside;
+    padding: 5px 10px;
     text-align: center;
     box-sizing: border-box;
-    border: 1px solid;
+    text-align: right;
     list-style: none;
     position: relative;
   }
 }
 
+$dayNamesHeight: 29px;
+
+.calendarCard {
+  height: 100%;
+}
+
 ol.calendarCard--dayNames {
   @extend %col7Grid;
+  border-bottom: 1px solid #c7c7cc;
+  height: $dayNamesHeight;
 }
 
 ol.calendarCard--days {
   @extend %col7Grid;
+  height: calc(100% - #{$dayNamesHeight} - 1px);
+
+  li {
+    border-right: 1px solid #e6e5e6;
+    border-bottom: 1px solid #e6e5e6;
+    color: #c3c3c3;
+    font-size: 12px;
+
+    &.selected {
+      border: 3px solid #00aeef;
+      color: #000;
+      padding: 2px 8px 3px 10px;
+    }
+  }
+
+  li:nth-child(7n-1), li:nth-child(7n) {
+    background-color: #f5f5f5;
+    color: #878787;
+  }
+
+  li:nth-child(7n) {
+    border-right:0;
+  }
 }
 
 .ngdialog {
@@ -34,12 +66,11 @@ ol.calendarCard--days {
     width: 100%;
     padding: 25px 50px;
     box-sizing: border-box;
-    border: 0;
-    border-bottom: 1px solid #e5e5e5;
+    background-color: #fff;
   }
   
   .ngdialog-close {
-    background: url(../../assets/images/icon-close-small.svg) no-repeat;
+    background: url(../../assets/images/icon-close.svg) no-repeat;
     background-size: contain;
     position: absolute;
     bottom: calc(100% + 15px);
@@ -60,7 +91,19 @@ ol.calendarCard--days {
     left: 50%;
     transform: translate(-50%, -50%);
   }
+
+
+  .ng-submitted .ng-invalid {
+    color: #fd685b;
+  }
+
   .row {
+    border-bottom: 1px solid #e5e5e5;
+
+    &:last-of-type {
+      border-bottom: 0;
+    }
+
     input {
       @extend %flatControl;
       width: 100%;
@@ -88,24 +131,55 @@ ol.calendarCard--days {
     &.row--button {
       position: relative;
 
-      button {
-        @extend %flatControl;
-        background: url(../../assets/images/icon-check-small.svg) no-repeat 50% 50%;
-        opacity: 1;
+      &, button, aside {
+        width: 100%;
+        height: 104px;
       }
 
-      p {
-        transition: opacity .4s;
-        opacity: 0;
+      button, aside {
+        transition: 0.6s;
+        transform-style: preserve-3d;
+        backface-visibility: hidden;
         position: absolute;
-        width: 100%;
-        height: 100%;
+        top: 0;
+        left: 0;
+        display: flex;
         text-align: center;
-        background-color: #fdfdfd;
-        z-index: 0;
+        align-items: center;
+      }
 
-        &.visible {
-          z-index: 1;
+      &.message {
+        button {
+          transform: rotateY(180deg);
+        }
+
+        aside {
+          transform: rotateY(0deg);
+        }
+      }
+
+      button {
+        transform: rotateY(0deg);
+        @extend %flatControl;
+
+        &:after {
+          margin: 0 auto;
+          content: '';
+          width: 73px;
+          height: 54px;
+          background-size: contain;
+          background: url(../../assets/images/icon-check-big.svg) no-repeat 50% 50%;
+        }
+      }
+
+      aside {
+        transform: rotateY(180deg);
+        background-color: #dfdfdf;
+        padding: 0 20px;
+
+        p {
+          width: 100%;
+          font-size: 18px;
         }
       }
     }
