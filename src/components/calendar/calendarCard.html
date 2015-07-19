@@ -5,7 +5,8 @@
   <ol class="calendarCard--days">
     <li data-date="{{ ::day.date }}"
       ng-click="selectDay(day)"  
-      ng-class="{'selected':day.isToday}"
-      ng-repeat="day in days">{{ ::day.name }}</li>
+      ng-class="{'selected':day.isToday, 'eventDay': day.eventData}"
+      ng-repeat="day in days"
+      data-event-name="{{ ::(day.displayName ? day.eventData.name : '') }}">{{ ::day.name }}</li>
   </ol>
 </section>

@@ -6,8 +6,6 @@ import shortid from 'shortid';
 
 import calendarConfig from './calendar.config.js';
 
-const _eventCollection = [];
-
 let _localStorageService;
 let _$q;
 let _lsPrefix;
@@ -22,7 +20,6 @@ class CalendarService {
     _$q = $q;
 
     this.loadConfiguration(CalendarConfig);
-    this.loadEvents();
   }
 
   loadConfiguration(calendarConfig) {
@@ -35,21 +32,24 @@ class CalendarService {
 
   getLastSelectedDate() {
     const lastSelectedDate = _localStorageService[_lsLastSelectedDate] || new Date();
+    const plainDate = moment(lastSelectedDate).toDate()
 
-    return moment(lastSelectedDate);
+    return plainDate;
   }
 
-  setLastSelectedDate(date) {
-    const isDateValid = moment(date).isValid();
+  setLastSelectedDate(plainDate) {
+    const date = moment(plainDate);
+    const isDateValid = date.isValid();
 
     if(!isDateValid) {
       throw Error('Date is not valid');
     }
 
-    _localStorageService[_lsLastSelectedDate] = date;
+    _localStorageService[_lsLastSelectedDate] = date.format('YYYY-MM-DD');
   }
 
-  getMonthData(date) {
+  getMonthData(plainDate) {
+    const date = moment(plainDate);
     const monthData = [];
     const startDate = this.getCardStartDate(date);
     const monthOrderNumber = date.month();
@@ -64,9 +64,7 @@ class CalendarService {
       currentDate.add(7, 'd');      
     } while(!isDone());
 
-    _eventCollection.forEach(e => {
-      
-    });
+    this.mergeMonthDataWithEvents(monthData);
 
     return monthData;
   }
@@ -116,46 +114,102 @@ class CalendarService {
     return startDate;
   }
 
-  loadEvents() {
+  getAllEvents() {    
     let lsEventCollection = _localStorageService[_lsEvents];
     let eventCollection = lsEventCollection ? JSON.parse(lsEventCollection) : [];
 
-    _eventCollection.push.apply(_eventCollection, eventCollection);
+    eventCollection.forEach(ev => {
+      ev.startDate = moment(ev.startDate, 'YYYY-MM-DD').toDate();
+      ev.endDate = moment(ev.endDate, 'YYYY-MM-DD').toDate();
+    })
+
+    return eventCollection;
   }
 
-  saveEvents() {
-    _localStorageService[_lsEvents] = JSON.stringify(_eventCollection);
+  updateEvents(eventData) {
+    const eventCollection = this.getAllEvents();
+
+    eventCollection.push(eventData);
+
+    _localStorageService[_lsEvents] = JSON.stringify(eventCollection);
+
+    return eventCollection;
   }
 
   createEvent(eventData) {
     const deferred = _$q.defer();
+    const newEvent = angular.copy(eventData);
 
-    const eventRange = moment.range(eventData.startDate, eventData.endDate);
-    const isEventOverlappingOtherOne = _eventCollection.some(e => {
-      let currentRange = moment.range(e.startDate, e.endDate);
-
-      return eventRange.overlaps(currentRange);
-    });
-    eventData.id = shortid.generate();
+    newEvent.id = shortid.generate();
     
-    if(!eventData.isValid) {
+    const validationErrorMessage = this.validateEventData(newEvent);
+    if(validationErrorMessage) {
       deferred.reject({
-        message: 'Proszę wypełnić wszystkie pola formularza.'
-      });
-    } else if(isEventOverlappingOtherOne) {
-      deferred.reject({
-        message: 'Nie zapisano. Istnieją już inne zdarzenia w wybranym przedziale czasu.'
+        message: validationErrorMessage
       });
     } else {
-      _eventCollection.push(eventData);
-      this.saveEvents();
+      newEvent.startDate = moment(newEvent.startDate).format('YYYY-MM-DD');
+      newEvent.endDate = moment(newEvent.endDate).format('YYYY-MM-DD');
+
+      const eventCollection = this.updateEvents(newEvent);
 
       deferred.resolve({
-        message: 'Zapisano wydarzenie'
+        message: 'Zapisano wydarzenie',
+        eventCollection: eventCollection
       });
     }
 
     return deferred.promise;
+  }
+
+  validateEventData(eventData) {
+    const isFormDataIncomplete = !eventData.isValid;
+    const isDateToBeforeDateFrom = moment(eventData.endDate).isBefore(eventData.startDate);
+    const eventRange = moment.range(eventData.startDate, eventData.endDate);
+    const isEventOverlappingOtherOne = this.getAllEvents().some(e => {
+      let currentRange = moment.range(e.startDate, e.endDate);
+
+      return eventRange.overlaps(currentRange);
+    });
+    let validationError = null;
+
+    if(isFormDataIncomplete) {
+      validationError = 'Proszę wypełnić wszystkie pola formularza.'
+    } else if(isDateToBeforeDateFrom) {
+      validationError = 'Data końcowa nie może być przed datą początkową.'
+    } else if(isEventOverlappingOtherOne) {
+      validationError = 'Nie zapisano. Istnieją już inne zdarzenia w wybranym przedziale czasu.'
+    }
+
+    return validationError
+  }
+
+  mergeMonthDataWithEvents(monthData) { 
+    const mergedMonthData = [];   
+    const firstDayOnCard = monthData[0].date;
+    const lastDayOnCard = monthData[monthData.length - 1].date;
+    const cardRange = moment.range(firstDayOnCard, lastDayOnCard);
+
+    const cartEventCollection = this.getAllEvents()
+      .filter(eventData => cardRange.contains(eventData.startDate) || cardRange.contains(eventData.startDate));
+
+    let setAsDayOfEvent = false;
+    for(let eventData of cartEventCollection) {
+      const eventRange = moment.range(eventData.startDate, eventData.endDate);
+
+      monthData.forEach(day => {
+        const isDayOfEvent = eventRange.contains(day.date);
+        const isStartOfRange = eventRange.start.isSame(day.date);
+        const isEndOfRange = eventRange.end.isSame(day.date);
+
+        if(isDayOfEvent) {
+          day.eventData = eventData;
+          day.isStartOfRange = isStartOfRange;
+          day.isEndOfRange = isEndOfRange;
+          day.displayName = day.isStartOfRange || day.date.getDay() === 1;
+        }
+      });
+    }
   }
 }
 

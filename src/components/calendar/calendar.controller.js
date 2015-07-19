@@ -10,10 +10,21 @@ class CalendarController {
     _calendarService = CalendarService;
     _ngDialog = ngDialog;
 
+
     this.selectedDate = _calendarService.getLastSelectedDate();
-    $scope.$watch(angular.bind(this, () => this.selectedDate), nv => this.displayCalendarCard(nv));
+    $scope.$watch(angular.bind(this, () => this.selectedDate),
+      nv => this.displayCalendarCard(nv)
+    );
+    
+    this.eventCollection = CalendarService.getAllEvents();
 
     this.localeData = moment.localeData();
+  }
+
+  getSelectedMonthFullName(date) {
+    const monthName = this.localeData.months(moment(date));
+
+    return monthName;
   }
 
   displayCalendarCard(date) {
@@ -28,7 +39,7 @@ class CalendarController {
   }
 
   displayPreviousMonth() {
-    let dateToSet = this.selectedDate.clone()
+    let dateToSet = moment(this.selectedDate)
       .subtract(1, 'month')
       .date(1);
     
@@ -36,7 +47,7 @@ class CalendarController {
   }
 
   displayNextMonth() {
-    let dateToSet = this.selectedDate.clone()
+    let dateToSet = moment(this.selectedDate)
       .add(1, 'month');
     
     this.displayCalendarCard(dateToSet);
@@ -49,6 +60,8 @@ class CalendarController {
     function createEventController($scope) {
       $scope.event = {};
       $scope.createEvent = (eventToSave) => {
+        eventToSave.isValid = $scope.createEventForm.$valid;
+
         _calendarService.createEvent(eventToSave)
           .then(onEventSaveSuccess, onEventSaveError);
       };

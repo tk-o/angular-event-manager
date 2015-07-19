@@ -1,4 +1,4 @@
-<form name="createEventForm" ng-submit="event.isValid=createEventForm.$isValid;createEvent(event)" novalidate>
+<form name="createEventForm" ng-submit="createEvent(event)" novalidate>
   <div class="row row--name">
     <input type="text" ng-model="event.name" placeholder="Nazwa" required />
   </div>

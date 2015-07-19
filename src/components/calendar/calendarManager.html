@@ -1,7 +1,7 @@
 <header>
   <aside>
-    <h1>{{ calendar.localeData.months(calendar.selectedDate) }}</h1>
-    <h2>{{ calendar.selectedDate.toDate() | date: 'yyyy'}}</h2>
+    <h1>{{ calendar.getSelectedMonthFullName(calendar.selectedDate) }}</h1>
+    <h2>{{ calendar.selectedDate | date: 'yyyy'}}</h2>
   </aside>
 
   <section>
