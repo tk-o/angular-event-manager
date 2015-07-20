@@ -1,0 +1,30 @@
+<section class="eventDetails">
+  <div class="row row--name">
+    <span>{{ event.name }}</span>
+  </div>
+  <div class="row row--name">
+    <span>{{ event.description }}</span>
+  </div>
+  <div class="row row--dates">
+    <span data-label="Data od">{{ event.startDate }}</span>
+    <span data-label="Data do">{{ event.endDate }}</span>
+  </div>
+  <div class="row row--button">
+    <button type="button"
+      ng-click="showConfirmation=true"
+      class="btn btn--remove"
+      title="Usuń wydarzenie"></button>
+  </div>
+  <section class="eventDeleteConfirmation" ng-if="showConfimation">
+    <header>
+      <p>Czy na pewno chcesz usunąć wydarzenie?</p>
+      <button type="button" 
+        ng-click="deleteEvent(event)" 
+        class="btn btn-confirm">Tak</button>
+    </header>
+    <footer>
+      <button type="button" ng-click="showConfirmation=false" class="btn btn--cancel">Jednak nie</button>
+    </footer>
+
+  </section>
+</section>

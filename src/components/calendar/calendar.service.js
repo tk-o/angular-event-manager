@@ -126,10 +126,16 @@ class CalendarService {
     return eventCollection;
   }
 
-  updateEvents(eventData) {
+  updateEvents(eventData, deleteEvent = false) {
     const eventCollection = this.getAllEvents();
 
-    eventCollection.push(eventData);
+    if(deleteEvent) {
+      const eventToDeleteIndex = eventCollection.findIndex(x => x.id === eventData.id);
+
+      eventCollection.splice(eventToDeleteIndex, 1);
+    } else {      
+      eventCollection.push(eventData);
+    }
 
     _localStorageService[_lsEvents] = JSON.stringify(eventCollection);
 
@@ -154,10 +160,21 @@ class CalendarService {
       const eventCollection = this.updateEvents(newEvent);
 
       deferred.resolve({
-        message: 'Zapisano wydarzenie',
-        eventCollection: eventCollection
+        message: 'Zapisano wydarzenie'
       });
     }
+
+    return deferred.promise;
+  }
+
+  deleteEvent(eventData) {
+    const deferred = _$q.defer();
+
+    const eventCollection = this.updateEvents(newEvent, deleteEvent);
+
+    deferred.resolve({
+      message: 'Usunięto wydarzenie'
+    });
 
     return deferred.promise;
   }

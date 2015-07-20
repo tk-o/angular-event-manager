@@ -24,6 +24,7 @@ function calendarCardDirective() {
     link: (scope, element, attrs, controllers) => {
       scope.weekDayNames = getWeekDayNames();
       scope.selectDay = selectDay(scope);
+      scope.openEventDetailsDialog = openEventDetailsDialog;
 
       scope.$watch('selectedDate', selectedDate => scope.selectDay(selectedDate));
     },
@@ -45,6 +46,12 @@ function selectDay(scope) {
       }
     });
   }
+}
+
+function openEventDetailsDialog(eventData) {
+  const mainViewScope = this.$parent.$parent;
+
+  mainViewScope.calendar.openEventDetailsDialog(eventData);
 }
 
 export default angular.module('app.calendar.directives', [])

@@ -4,9 +4,12 @@
   </ol>
   <ol class="calendarCard--days">
     <li data-date="{{ ::day.date }}"
-      ng-click="selectDay(day)"  
-      ng-class="{'selected':day.isToday, 'eventDay': day.eventData}"
+      ng-click="selectDay(day)"
+      ng-dblclick="openEventDetailsDialog(day.eventData)"
+      ng-class="{'selected':day.isToday, 'eventDay': day.eventData, 'hasName': day.displayName, 'isFristDayOfEvent': day.isStartOfRange , 'isLastDayOfEvent': day.isEndOfRange }"
       ng-repeat="day in days"
-      data-event-name="{{ ::(day.displayName ? day.eventData.name : '') }}">{{ ::day.name }}</li>
+      data-day-name="{{ ::day.name }}">
+        <span ng-if="day.displayName" title="Kliknij dwukrotnie aby otworzyć szczegóły">{{ ::day.eventData.name }}</span>
+      </li>
   </ol>
 </section>

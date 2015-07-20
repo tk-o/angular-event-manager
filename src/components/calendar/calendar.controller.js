@@ -12,13 +12,15 @@ class CalendarController {
 
 
     this.selectedDate = _calendarService.getLastSelectedDate();
-    $scope.$watch(angular.bind(this, () => this.selectedDate),
-      nv => this.displayCalendarCard(nv)
-    );
+    $scope.$watch(angular.bind(this, () => this.selectedDate), fetchDataForDate.bind(this));
     
     this.eventCollection = CalendarService.getAllEvents();
 
     this.localeData = moment.localeData();
+  }
+
+  refreshCalendarCard() {
+    fetchDataForDate.call(this, this.selectedDate);
   }
 
   getSelectedMonthFullName(date) {
@@ -28,34 +30,35 @@ class CalendarController {
   }
 
   displayCalendarCard(date) {
-    _calendarService.setLastSelectedDate(date);
     this.days = _calendarService.getMonthData(date);
   }
 
   displayCurrentMonth() {
     let dateToSet = moment();
-    
-    this.displayCalendarCard(dateToSet);
+
+    this.selectedDate = dateToSet.toDate();
   }
 
   displayPreviousMonth() {
     let dateToSet = moment(this.selectedDate)
       .subtract(1, 'month')
       .date(1);
-    
-    this.displayCalendarCard(dateToSet);
+   
+    this.selectedDate = dateToSet.toDate(); 
   }
 
   displayNextMonth() {
     let dateToSet = moment(this.selectedDate)
-      .add(1, 'month');
+      .add(1, 'month')
+      .date(1);
     
-    this.displayCalendarCard(dateToSet);
+    this.selectedDate = dateToSet.toDate(); 
   }
   
   openCreateEventDialog() {
     const template = require('./createEventDialog.html');
     const dialog = createDialog(template, createEventController);
+    const contollerCtx = this;
 
     function createEventController($scope) {
       $scope.event = {};
@@ -63,11 +66,12 @@ class CalendarController {
         eventToSave.isValid = $scope.createEventForm.$valid;
 
         _calendarService.createEvent(eventToSave)
-          .then(onEventSaveSuccess, onEventSaveError);
+          .then(onEventSaveSuccess.bind(contollerCtx), onEventSaveError);
       };
 
       function onEventSaveSuccess(response) {
         $scope.message = response.message;
+        this.refreshCalendarCard.call(this);
 
         setTimeout(() => dialog.close(), 1500);
       }
@@ -82,9 +86,41 @@ class CalendarController {
       }
     }
   }
+  
+  openEventDetailsDialog(event) {
+    const template = require('./openEventDetailsDialog.html');
+    const dialog = createDialog(template, eventDetailsController);
+
+    function eventDetailsController($scope) {
+      $scope.event = event;
+      $scope.deleteEvent = (eventToDelete) => {
+        _calendarService.deleteEvent(eventToDelete)
+          .then(onEventDeleteSuccess);
+      };
+
+      function onEventDeleteSuccess(response) {
+        dialog.close();
+
+        $scope.refreshCalendarCard();
+      }
+    }
+  }
 }
 
 CalendarController.$inject = ['$scope', 'CalendarService', 'ngDialog'];
+
+function fetchDataForDate(date) {
+  const normalizedDate = moment(date)
+    .hour(0)
+    .minute(0)
+    .second(0)
+    .millisecond(0)
+    .toDate();
+
+  _calendarService.setLastSelectedDate(normalizedDate);
+
+  this.displayCalendarCard(normalizedDate);
+};
 
 function createDialog (template, controller) {
   const dialog = _ngDialog.open({ 
