@@ -90,18 +90,19 @@ class CalendarController {
   openEventDetailsDialog(event) {
     const template = require('./openEventDetailsDialog.html');
     const dialog = createDialog(template, eventDetailsController);
+    const contollerCtx = this;
 
     function eventDetailsController($scope) {
       $scope.event = event;
       $scope.deleteEvent = (eventToDelete) => {
         _calendarService.deleteEvent(eventToDelete)
-          .then(onEventDeleteSuccess);
+          .then(onEventDeleteSuccess.bind(contollerCtx));
       };
 
       function onEventDeleteSuccess(response) {
         dialog.close();
 
-        $scope.refreshCalendarCard();
+        this.refreshCalendarCard();
       }
     }
   }
@@ -119,7 +120,9 @@ function fetchDataForDate(date) {
 
   _calendarService.setLastSelectedDate(normalizedDate);
 
-  this.displayCalendarCard(normalizedDate);
+  const newDate = _calendarService.getLastSelectedDate();
+
+  this.displayCalendarCard(newDate);
 };
 
 function createDialog (template, controller) {

@@ -38,14 +38,14 @@ class CalendarService {
   }
 
   setLastSelectedDate(plainDate) {
-    const date = moment(plainDate);
-    const isDateValid = date.isValid();
+    const date = this.removeTimezoneOffset(plainDate);
+    const isDateValid = moment(date).isValid();
 
     if(!isDateValid) {
       throw Error('Date is not valid');
     }
 
-    _localStorageService[_lsLastSelectedDate] = date.format('YYYY-MM-DD');
+    _localStorageService[_lsLastSelectedDate] = date;
   }
 
   getMonthData(plainDate) {
@@ -119,8 +119,8 @@ class CalendarService {
     let eventCollection = lsEventCollection ? JSON.parse(lsEventCollection) : [];
 
     eventCollection.forEach(ev => {
-      ev.startDate = moment(ev.startDate, 'YYYY-MM-DD').toDate();
-      ev.endDate = moment(ev.endDate, 'YYYY-MM-DD').toDate();
+      ev.startDate = new Date(ev.startDate);
+      ev.endDate = new Date(ev.endDate);
     })
 
     return eventCollection;
@@ -154,8 +154,8 @@ class CalendarService {
         message: validationErrorMessage
       });
     } else {
-      newEvent.startDate = moment(newEvent.startDate).format('YYYY-MM-DD');
-      newEvent.endDate = moment(newEvent.endDate).format('YYYY-MM-DD');
+      newEvent.startDate = this.removeTimezoneOffset(newEvent.startDate);
+      newEvent.endDate = this.removeTimezoneOffset(newEvent.endDate);
 
       const eventCollection = this.updateEvents(newEvent);
 
@@ -169,8 +169,9 @@ class CalendarService {
 
   deleteEvent(eventData) {
     const deferred = _$q.defer();
+    const deleteEvent = true;
 
-    const eventCollection = this.updateEvents(newEvent, deleteEvent);
+    const eventCollection = this.updateEvents(eventData, deleteEvent);
 
     deferred.resolve({
       message: 'Usunięto wydarzenie'
@@ -199,6 +200,15 @@ class CalendarService {
     }
 
     return validationError
+  }
+
+  removeTimezoneOffset(plainDate) {
+    let date = moment(plainDate);
+    let offset = plainDate.getTimezoneOffset()/-60;
+
+    date.add(offset, 'hour');
+
+    return date.toDate();
   }
 
   mergeMonthDataWithEvents(monthData) { 
