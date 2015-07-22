@@ -88,6 +88,10 @@ class CalendarController {
   }
   
   openEventDetailsDialog(event) {
+    if(!event) {
+      return;
+    }
+
     const template = require('./openEventDetailsDialog.html');
     const dialog = createDialog(template, eventDetailsController);
     const contollerCtx = this;
