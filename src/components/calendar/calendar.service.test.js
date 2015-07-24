@@ -23,16 +23,17 @@ describe('Calendar Service', () => {
     let invalidDate = 'fakeDate';
 
     it('Is set if valid', () => {
+      let validDateWithoutTimezoneOffset = CalendarService.removeTimezoneOffset(validDate);
       CalendarService.setLastSelectedDate(validDate);
 
-      expect(CalendarService.getLastSelectedDate().toDate()).toEqual(validDate);
+      expect(CalendarService.getLastSelectedDate()).toEqual(validDateWithoutTimezoneOffset);
     });
 
     it('Is not set if invalid', () => {
       try {
         CalendarService.setLastSelectedDate(invalidDate);
       } catch(e) {
-        expect(CalendarService.getLastSelectedDate().toDate()).not.toEqual(invalidDate);
+        expect(CalendarService.getLastSelectedDate()).not.toEqual(invalidDate);
       }
     });
   });
